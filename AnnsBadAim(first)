@@ -1,0 +1,42 @@
+This is the first puzzle on http://forensicscontest.com/ 
+Title : Ann's Bad AIM
+
+Investigate the traffic of Ann's computer (192.168.1.158) by downloading the Pcap from the site. (used Wireshark)
+
+    First thing I did was to filter for Ann's IP
+ 
+ip.addr==192.168.1.158
+
+    We know that we are looking for an AIM message (it says so in the title) but in the real world that wouldn't be so easy, so I looked up the IP in ARIN and found:
+
+Source Registry
+ARIN
+Net Range
+64.12.0.0 - 64.12.255.255
+CIDR
+64.12.0.0/16
+Name
+AOL-MTC
+Handle
+NET-64-12-0-0-1
+Parent
+NET-64-0-0-0-0
+Net Type
+DIRECT ALLOCATION
+Origin AS
+not provided
+Registration
+Mon, 13 Dec 1999 05:00:00 GMT (Sun Dec 12 1999 local time)
+Last Changed
+Fri, 22 Mar 2019 20:10:17 GMT (Fri Mar 22 2019 local time)
+
+    The puzzle was published on SEPTEMBER 25, 2009.  So at the time, AOL would have had this IP.  Since we are looking up IMs, it has a good chance to be going to an AIM server. So I decode her first TCP packet (right-click> decode as) from TLS to  AIM.
+
+    This changes the SSL message to unencrypted AIM messages.  Now that we found the AIM transmissions, we will open up the conversation where we see "outgoing to message to Sec558user1" (right-click packet 25 > follow > TCP stream).  Here we see the conversation (it is still encoded but is plain text.  You can see the message that packet sent in TLV message block if you dig deeper, but this is good for me).  Now we see the message about the secret recipe is intended for Sec558user1.  In this conversation, We immediately have the answer to the first 2 questions.
+
+
+1. What is the name of Ann’s IM buddy?  =  Sec558user1 
+
+2. What was the first comment in the captured IM conversation?  =  Here's the secret recipe... I just downloaded it from the file server. Just copy to a thumb drive and you're good to go &gt;:-) 
+
+TO BE CONTINUED (sleepy time)
