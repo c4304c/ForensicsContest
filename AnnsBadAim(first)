@@ -3,6 +3,11 @@ Title : Ann's Bad AIM
 
 Investigate the traffic of Ann's computer (192.168.1.158) by downloading the Pcap from the site. (used Wireshark)
 
+Before starting, its a good idea to verify the file is original by checking the MD5SUM
+
+md5sum evidence01.pcap 
+d187d77e18c84f6d72f5845edca833f5  evidence01.pcap
+
     First thing I did was to filter for Ann's IP
  
 ip.addr==192.168.1.158
