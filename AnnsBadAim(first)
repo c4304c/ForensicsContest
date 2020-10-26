@@ -40,26 +40,31 @@ Fri, 22 Mar 2019 20:10:17 GMT (Fri Mar 22 2019 local time)
 
 
 1. What is the name of Ann’s IM buddy?  =  Sec558user1 
-
+########################################################################################################################################################################
+########################################################################################################################################################################
 2. What was the first comment in the captured IM conversation?  =  Here's the secret recipe... I just downloaded it from the file server. Just copy to a thumb drive and 
 you're good to go &gt;:-) 
+########################################################################################################################################################################
+########################################################################################################################################################################
 3. What is the name of the file Ann transferred?
     Port 5190 is the port used by AIM (according to google), so I filtered for that port  (tcp.port eq 5190).  After research, I found that OSCAR uses OFT to transfer files. So I brought up the conversation of the file after the handshake (SYN, SYN/ACK, ACK) and found 
 OFT2.....................................d..........................Cool FileXfer...............................................................................................................recipe.docx   
 
 This shows a file being transfers names recipe.docx
-
+########################################################################################################################################################################
+########################################################################################################################################################################
 4. What is the magic number of the file you want to extract (first four bytes)?
      A quick google search shows that magic number for a .docx is 50 4B 03 04 [PK]
-
+########################################################################################################################################################################
+########################################################################################################################################################################
 5. What was the MD5sum of the file?
 We have to abstract the file for this.  To do so,  We have to save the conversation in raw data (saved as ‘recipe.docx’) and remove anything before the magic number and the OFT trailer after the file (beginning after the file).  Run the md5sum command to get the MD5sum.  (I renamed the file from the data I pulled to ‘recipe2.docx’
 
 md5sum recipe2.docx 
 8350582774e1d4dbe1d61d64c89e0ea1  recipe2.docx
 
-
-
+########################################################################################################################################################################
+########################################################################################################################################################################
 6. What is the secret recipe?
 All that is left is to open the file
 
