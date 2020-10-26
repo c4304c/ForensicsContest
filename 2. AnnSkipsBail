@@ -1,0 +1,110 @@
+This is the second puzzle on http://forensicscontest.com/ 
+Title : Ann Skips Bail
+
+Like in the first one, before starting I checked the integrity of the MD5:
+
+md5sum evidence02.pcap 
+cfac149a49175ac8e89d5b5b5d69bad3  evidence02.pcap
+
+and it matches.
+
+
+
+First Thing I did was filter for SMTP (since this is the email transmission protocol (sending)). I came across a packet with (‘EHLO annlaptop’).  
+So I filtered the IP (‘ip.addr == 192.168.1.159’).  That verified the laptop to Ann with a Host Announcment.
+
+I set up the SMTP filter again and found a packet that was “AUTH LOGIN”.  I opened that one and followed the TCP stream.  I found these line:
+
+AUTH LOGIN
+334 VXNlcm5hbWU6
+c25lYWt5ZzMza0Bhb2wuY29t
+334 UGFzc3dvcmQ6
+NTU4cjAwbHo=
+235 AUTHENTICATION SUCCESSFUL
+
+    Which I believe would be the username and password login information.  If we continue through the message we will find the line: 
+
+From: "Ann Dercover" <sneakyg33k@aol.com>
+
+And further down we see: 
+
+Sorry-- I can't do lunch next week =
+after all.=20
+Heading out of town. Another time! -Ann
+
+So the message doesn’t seem like the email to her partner but we can see her email and the encrypted password.  
+The ‘=’ padding at the end and size makes me think it is base64,  so I decode it as base64.
+
+echo 'NTU4cjAwbHo=' | base64 -d
+558r00lz
+
+So now I have to go through and find another email.  
+The next email that I find has a packet that :
+
+RCPT TO: <mistersecretx@aol.com>
+
+This seems promising, so I investigate it. I came across the message:
+
+Hi sweetheart! Bring your fake passport and a bathing suit. Address =
+attached. love, Ann
+
+I also some across a base64 encoded file named 
+filename="secretrendezvous.docx"
+
+I copied all the base64 text and put it in a file.  I then decoded the file to a .docx file
+ base64 -d < secret.b64 > secret.docx
+
+I opened the secret.docx file and found the test:
+“Meet me at the fountain near the rendezvous point. Address below. I’m bringing all the cash.”
+With a map screenshot under it to Playa del Carmen, 77780, Mexico  
+
+Last two things are to get the md5sums of the attachment and the image.
+The attachment is easy,  just ran ‘md5sum secret.docx’ and got:
+9e423e11db88f01bbff81172839e1923
+
+The one for the image, I had to separate the file.  The .docx is a compressed file
+That can be unzipped (unzip -d doc secret.docx). To get to the image you have to take the path ‘doc/word/media’ and now run ‘md5sum image1.png’
+
+aadeace50997b1ba24b09ac2ef1940b7  image1.png
+
+
+
+
+1. What is Ann’s email address?
+
+sneakyg33k@aol.com
+
+############################################################################################################################
+2. What is Ann’s email password?
+
+558r00lz
+
+############################################################################################################################
+3. What is Ann’s secret lover’s email address?
+
+RCPT TO: <mistersecretx@aol.com>
+
+############################################################################################################################
+4. What two items did Ann tell her secret lover to bring?
+
+fake passport and a bathing suit.
+
+############################################################################################################################
+5. What is the NAME of the attachment Ann sent to her secret lover?
+
+filename="secretrendezvous.docx"
+
+############################################################################################################################
+6. What is the MD5sum of the attachment Ann sent to her secret lover?
+
+9e423e11db88f01bbff81172839e1923  
+
+############################################################################################################################
+7. In what CITY and COUNTRY is their rendez-vous point?
+
+Playa del Carmen, Mexico  
+
+############################################################################################################################
+8. What is the MD5sum of the image embedded in the document?
+
+aadeace50997b1ba24b09ac2ef1940b7 
