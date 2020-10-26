@@ -1,7 +1,28 @@
 This is the first puzzle on http://forensicscontest.com/ 
 Title : Ann's Bad AIM
 
+ANSWERS:
+1. What is the name of Ann’s IM buddy?  
+   Sec558user1 
+2. What was the first comment in the captured IM conversation?   
+   Here's the secret recipe... I just downloaded it from the file server. Just copy to a thumb drive and you're good to go &gt;:-) 
+3. What is the name of the file Ann transferred?  
+   recipe.docx
+4. What is the magic number of the file you want to extract (first four bytes)?
+   50 4B 03 04 [PK]
+5. What was the MD5sum of the file?
+   8350582774e1d4dbe1d61d64c89e0ea1
+6. What is the secret recipe?
+   Recipe for Disaster:
+    1 serving
+    Ingredients:
+    4 cups sugar
+    2 cups water
+    In a medium saucepan, bring the water to a boil. Add sugar. Stir gently over low heat until sugar is fully dissolved. Remove  the  saucepan from heat.  Allow to cool completely. Pour into gas tank. Repeat as necessary. 
+
+PROCESS:
 Investigate the traffic of Ann's computer (192.168.1.158) by downloading the Pcap from the site. (used Wireshark)
+and answer the 6 questions (above).
 
 Before starting, its a good idea to verify the file is original by checking the MD5SUM
 
@@ -12,7 +33,7 @@ d187d77e18c84f6d72f5845edca833f5  evidence01.pcap
  
 ip.addr==192.168.1.158
 
-    We know that we are looking for an AIM message (it says so in the title) but in the real world that wouldn't be so easy, so I looked up the IP in ARIN and found:
+    We know that we are looking for an AIM message (it says so in the title) but in the real world that wouldn't be so easy, so I looked up the IP that was commuticating with Ann's IP (ip.addr==192.168.1.158) in ARIN and found:
 
 Source Registry
 ARIN
@@ -36,49 +57,18 @@ Last Changed
 Fri, 22 Mar 2019 20:10:17 GMT (Fri Mar 22 2019 local time)
 
     The puzzle was published on SEPTEMBER 25, 2009.  So at the time, AOL would have had this IP.  Since we are looking up IMs, it has a good chance to be going to an AIM server. 
-    So I decode her first TCP packet (right-click> decode as) from TLS to  AIM.
+So I decode her first TCP packet (right-click> decode as) from TLS to  AIM.
 
     This changes the SSL message to unencrypted AIM messages.  Now that we found the AIM transmissions, we will open up the conversation where we see
-    "outgoing to message to Sec558user1" (right-click packet 25 > follow > TCP stream).  Here we see the conversation (it is still encoded but is plain text.  
-    You can see the message that packet sent in TLV message block if you dig deeper, but this is good for me).  Now we see the message about the secret recipe 
-    is intended for Sec558user1.  In this conversation, We immediately have the answer to the first 2 questions.
+"outgoing to message to Sec558user1" (right-click packet 25 > follow > TCP stream).  Here we see the conversation (it is still encoded but is plain text.  
+You can see the message that packet sent in TLV message block if you dig deeper, but this is good for me).  Now we see the message about the secret recipe 
+is intended for Sec558user1.  In this conversation, We immediately have the answer to the first 2 questions.
 
-
-1. What is the name of Ann’s IM buddy?  =  Sec558user1 
-########################################################################################################################################################################
-########################################################################################################################################################################
-2. What was the first comment in the captured IM conversation?  =  Here's the secret recipe... I just downloaded it from the file server. Just copy to a thumb drive and 
-you're good to go &gt;:-) 
-########################################################################################################################################################################
-########################################################################################################################################################################
-3. What is the name of the file Ann transferred?
     Port 5190 is the port used by AIM (according to google), so I filtered for that port  (tcp.port eq 5190).  After research, I found that OSCAR uses OFT to transfer files. So I brought up the conversation of the file after the handshake (SYN, SYN/ACK, ACK) and found 
 OFT2.....................................d..........................Cool FileXfer...............................................................................................................recipe.docx   
-
 This shows a file being transfers names recipe.docx
-########################################################################################################################################################################
-########################################################################################################################################################################
-4. What is the magic number of the file you want to extract (first four bytes)?
-     A quick google search shows that magic number for a .docx is 50 4B 03 04 [PK]
-########################################################################################################################################################################
-########################################################################################################################################################################
-5. What was the MD5sum of the file?
-We have to abstract the file for this.  To do so,  We have to save the conversation in raw data (saved as ‘recipe.docx’) and remove anything before the magic number and the OFT trailer after the file (beginning after the file).  Run the md5sum command to get the MD5sum.  (I renamed the file from the data I pulled to ‘recipe2.docx’
 
-md5sum recipe2.docx 
-8350582774e1d4dbe1d61d64c89e0ea1  recipe2.docx
-
-########################################################################################################################################################################
-########################################################################################################################################################################
-6. What is the secret recipe?
-All that is left is to open the file
-
-Recipe for Disaster:
-1 serving
-Ingredients:
-4 cups sugar
-2 cups water
-In a medium saucepan, bring the water to a boil. Add sugar. Stir gently over low heat until sugar is fully dissolved. Remove  the  saucepan from heat.  Allow to cool completely. Pour into gas tank. Repeat as necessary. 
-
-
+A quick google search shows that magic number for a .docx is 50 4B 03 04 [PK].
+We have to abstract the file for this.  To do so,  We have to save the conversation in raw data (saved as ‘recipe.docx’) and remove anything before the magic number and the OFT trailer after the file (beginning after the file).  Run the md5sum command to get the MD5sum.  (I renamed the file from the data I pulled to ‘recipe2.docx’.
+All that is left is to open the file.
 
